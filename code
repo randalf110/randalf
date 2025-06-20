@@ -1,3 +1,471 @@
+Thank you for sharing the details. It looks like you're trying to upload a PDF file to an external API (Gemini) and get a response based on a prompt. You're using Spring Boot with IntelliJ, but your HomeController.java has several syntax issues, annotation errors, and is not properly structured.
+
+I'll guide you step-by-step and then give you a corrected version of your HomeController.java.
+
+
+---
+
+✅ What You're Trying to Do:
+
+1. Serve a home page (index.html).
+
+
+2. Accept a file upload (POST /upload).
+
+
+3. Send this file with a POST request to a Gemini API (with a prompt in the URL).
+
+
+4. Return the extracted result.
+
+
+
+
+---
+
+❌ Problems in Your Code:
+
+Syntax issues: Controller annotation not correct.
+
+Incorrect use of constructor and RestTemplate.
+
+Improper @Value annotation (typo: $(spring.application.name) should be ${...}).
+
+Wrong or missing return types.
+
+Missing class and method braces.
+
+Wrong imports like import org.springframework.web.bind.annotation.".
+
+
+
+---
+
+✅ Corrected HomeController.java
+
+package com.example.demo.controller;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.File;
+
+@Controller
+public class HomeController {
+
+    @Value("${spring.application.name}")
+    private String appName;
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    @GetMapping("/")
+    public String index(Model model) {
+        model.addAttribute("appName", appName);
+        return "index"; // index.html must be placed in src/main/resources/templates
+    }
+
+    @PostMapping("/upload")
+    @ResponseBody
+    public String uploadAndSendFile() {
+        System.out.println("App Name: " + appName);
+
+        String filePath = "C:\\Users\\bupuvar\\Downloads\\AI Docs.pdf";
+        String url = "http://ingestion.api.dbtextract-eu.uat.gcp.db.com/docuquery" +
+                     "?service=Gemini&subservice=Gemini-askQuery&poseSingleQuery=false" +
+                     "&model=GEMINI_2_0_FLASH_001&tenantID=u3xn_uat" +
+                     "&prompt=extract document date";
+
+        File file = new File(filePath);
+        if (!file.exists()) {
+            return "File not found: " + filePath;
+        }
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", new FileSystemResource(file));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    requestEntity,
+                    String.class
+            );
+
+            return response.getBody();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error occurred: " + e.getMessage();
+        }
+    }
+}
+
+
+---
+
+✅ What You Need in application.properties:
+
+spring.application.name=SpringGeminiUploader
+
+
+---
+
+📁 Where to Put index.html:
+
+Place it in:
+
+src/main/resources/templates/index.html
+
+And use Thymeleaf or static HTML based on your Spring setup.
+
+
+---
+
+🚀 To Run:
+
+1. Start your Spring Boot app.
+
+
+2. Open browser → http://localhost:8080/.
+
+
+3. If you want to test the upload, either:
+
+Call /upload from browser or Postman.
+
+Or integrate it with a front-end form (I can help with this too).
+
+
+
+
+
+---
+
+Would you like a simple frontend HTML form to upload a file instead of hardcoding the file path in Java?
+
+Thank you for sharing the details. It looks like you're trying to upload a PDF file to an external API (Gemini) and get a response based on a prompt. You're using Spring Boot with IntelliJ, but your HomeController.java has several syntax issues, annotation errors, and is not properly structured.
+
+I'll guide you step-by-step and then give you a corrected version of your HomeController.java.
+
+
+---
+
+✅ What You're Trying to Do:
+
+1. Serve a home page (index.html).
+
+
+2. Accept a file upload (POST /upload).
+
+
+3. Send this file with a POST request to a Gemini API (with a prompt in the URL).
+
+
+4. Return the extracted result.
+
+
+
+
+---
+
+❌ Problems in Your Code:
+
+Syntax issues: Controller annotation not correct.
+
+Incorrect use of constructor and RestTemplate.
+
+Improper @Value annotation (typo: $(spring.application.name) should be ${...}).
+
+Wrong or missing return types.
+
+Missing class and method braces.
+
+Wrong imports like import org.springframework.web.bind.annotation.".
+
+
+
+---
+
+✅ Corrected HomeController.java
+
+package com.example.demo.controller;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.File;
+
+@Controller
+public class HomeController {
+
+    @Value("${spring.application.name}")
+    private String appName;
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    @GetMapping("/")
+    public String index(Model model) {
+        model.addAttribute("appName", appName);
+        return "index"; // index.html must be placed in src/main/resources/templates
+    }
+
+    @PostMapping("/upload")
+    @ResponseBody
+    public String uploadAndSendFile() {
+        System.out.println("App Name: " + appName);
+
+        String filePath = "C:\\Users\\bupuvar\\Downloads\\AI Docs.pdf";
+        String url = "http://ingestion.api.dbtextract-eu.uat.gcp.db.com/docuquery" +
+                     "?service=Gemini&subservice=Gemini-askQuery&poseSingleQuery=false" +
+                     "&model=GEMINI_2_0_FLASH_001&tenantID=u3xn_uat" +
+                     "&prompt=extract document date";
+
+        File file = new File(filePath);
+        if (!file.exists()) {
+            return "File not found: " + filePath;
+        }
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", new FileSystemResource(file));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    requestEntity,
+                    String.class
+            );
+
+            return response.getBody();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error occurred: " + e.getMessage();
+        }
+    }
+}
+
+
+---
+
+✅ What You Need in application.properties:
+
+spring.application.name=SpringGeminiUploader
+
+
+---
+
+📁 Where to Put index.html:
+
+Place it in:
+
+src/main/resources/templates/index.html
+
+And use Thymeleaf or static HTML based on your Spring setup.
+
+
+---
+
+🚀 To Run:
+
+1. Start your Spring Boot app.
+
+
+2. Open browser → http://localhost:8080/.
+
+
+3. If you want to test the upload, either:
+
+Call /upload from browser or Postman.
+
+Or integrate it with a front-end form (I can help with this too).
+
+
+
+
+
+---
+
+Would you like a simple frontend HTML form to upload a file instead of hardcoding the file path in Java?
+
+Thank you for sharing the details. It looks like you're trying to upload a PDF file to an external API (Gemini) and get a response based on a prompt. You're using Spring Boot with IntelliJ, but your HomeController.java has several syntax issues, annotation errors, and is not properly structured.
+
+I'll guide you step-by-step and then give you a corrected version of your HomeController.java.
+
+
+---
+
+✅ What You're Trying to Do:
+
+1. Serve a home page (index.html).
+
+
+2. Accept a file upload (POST /upload).
+
+
+3. Send this file with a POST request to a Gemini API (with a prompt in the URL).
+
+
+4. Return the extracted result.
+
+
+
+
+---
+
+❌ Problems in Your Code:
+
+Syntax issues: Controller annotation not correct.
+
+Incorrect use of constructor and RestTemplate.
+
+Improper @Value annotation (typo: $(spring.application.name) should be ${...}).
+
+Wrong or missing return types.
+
+Missing class and method braces.
+
+Wrong imports like import org.springframework.web.bind.annotation.".
+
+
+
+---
+
+✅ Corrected HomeController.java
+
+package com.example.demo.controller;
+
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.*;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
+import java.io.File;
+
+@Controller
+public class HomeController {
+
+    @Value("${spring.application.name}")
+    private String appName;
+
+    private final RestTemplate restTemplate = new RestTemplate();
+
+    @GetMapping("/")
+    public String index(Model model) {
+        model.addAttribute("appName", appName);
+        return "index"; // index.html must be placed in src/main/resources/templates
+    }
+
+    @PostMapping("/upload")
+    @ResponseBody
+    public String uploadAndSendFile() {
+        System.out.println("App Name: " + appName);
+
+        String filePath = "C:\\Users\\bupuvar\\Downloads\\AI Docs.pdf";
+        String url = "http://ingestion.api.dbtextract-eu.uat.gcp.db.com/docuquery" +
+                     "?service=Gemini&subservice=Gemini-askQuery&poseSingleQuery=false" +
+                     "&model=GEMINI_2_0_FLASH_001&tenantID=u3xn_uat" +
+                     "&prompt=extract document date";
+
+        File file = new File(filePath);
+        if (!file.exists()) {
+            return "File not found: " + filePath;
+        }
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", new FileSystemResource(file));
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        try {
+            ResponseEntity<String> response = restTemplate.exchange(
+                    url,
+                    HttpMethod.POST,
+                    requestEntity,
+                    String.class
+            );
+
+            return response.getBody();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Error occurred: " + e.getMessage();
+        }
+    }
+}
+
+
+---
+
+✅ What You Need in application.properties:
+
+spring.application.name=SpringGeminiUploader
+
+
+---
+
+📁 Where to Put index.html:
+
+Place it in:
+
+src/main/resources/templates/index.html
+
+And use Thymeleaf or static HTML based on your Spring setup.
+
+
+---
+
+🚀 To Run:
+
+1. Start your Spring Boot app.
+
+
+2. Open browser → http://localhost:8080/.
+
+
+3. If you want to test the upload, either:
+
+Call /upload from browser or Postman.
+
+Or integrate it with a front-end form (I can help with this too).
+
+
+
+
+
+---
+
+Would you like a simple frontend HTML form to upload a file instead of hardcoding the file path in Java?
+
 Absolutely! Let's **teach you Spring Boot + REST API** from **scratch**, using a **simple, real-world mini project**, and include **Postman testing**.
 
 This will give you confidence and show your mentor that you're learning!
